@@ -61,6 +61,11 @@ func (newton *Newton) Calc(x float64, n int) (float64, error) {
 	return result, nil
 }
 
+// SepFiffTable() returns a table of the split differences of the last operation.
+func (newton *Newton) SepDiffTable() [][]float64 {
+	return newton.points
+}
+
 // configure() creates a configuration of the values of the starting points. n + 1 points are selected, as close as possible to x.
 // x - the input value.
 // n - the degree of the Newton polynomial.

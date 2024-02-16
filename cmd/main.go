@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/hahaclassic/computational-algorithms.git/internal/format"
 	"github.com/hahaclassic/computational-algorithms.git/internal/interpolation"
+	"github.com/hahaclassic/computational-algorithms.git/internal/matrix"
 	"github.com/hahaclassic/computational-algorithms.git/internal/reader"
 )
 
@@ -39,7 +39,7 @@ func main() {
 
 	//fmt.Println(strData)
 
-	data, err := format.MatrixAtof(strData[1:])
+	data, err := matrix.MatrixAtof(strData[1:])
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -53,4 +53,5 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Println(res)
+	fmt.Println(newton.SepDiffTable())
 }
