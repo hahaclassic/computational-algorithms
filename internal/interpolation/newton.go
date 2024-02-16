@@ -19,10 +19,23 @@ type Newton struct {
 	config [][]float64
 }
 
+// CreateNewtonPolinomial() creates a Newton structure that implements interpolation using the Newton polynomial.
+// points[i][0] - x coordinate.
+// points[i][1] - y coordinate.
 func CreateNewtonPolinomial(points [][]float64) *Newton {
 	return &Newton{points: points}
 }
 
+// SetPoints() modifies the set of points from which the approximate value is calculated.
+// points[i][0] - x coordinate.
+// points[i][1] - y coordinate.
+func (newton *Newton) SetPoints(points [][]float64) {
+	newton.points = points
+}
+
+// Calc() calculates the approximate value of y(x) for the degree of the polynomial n.
+// x - the input value.
+// n - the degree of the Newton polynomial.
 func (newton *Newton) Calc(x float64, n int) (float64, error) {
 	err := newton.configure(x, n)
 	if err != nil {
@@ -48,6 +61,9 @@ func (newton *Newton) Calc(x float64, n int) (float64, error) {
 	return result, nil
 }
 
+// configure() creates a configuration of the values of the starting points. n + 1 points are selected, as close as possible to x.
+// x - the input value.
+// n - the degree of the Newton polynomial.
 func (newton *Newton) configure(x float64, n int) error {
 
 	if len(newton.points) <= n {
@@ -92,6 +108,8 @@ func (newton *Newton) configure(x float64, n int) error {
 	return nil
 }
 
+// buildDiff() calculates the values of the separated differences.
+// n - the degree of the Newton polynomial.
 func (newton *Newton) buildDiff(n int) {
 
 	length := n + 1
