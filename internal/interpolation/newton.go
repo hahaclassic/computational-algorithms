@@ -2,6 +2,7 @@ package interpolation
 
 import (
 	"errors"
+	"fmt"
 	"slices"
 	"sort"
 )
@@ -59,11 +60,6 @@ func (newton *Newton) Calc(x float64, n int) (float64, error) {
 	}
 
 	return result, nil
-}
-
-// SepFiffTable() returns a table of the split differences of the last operation.
-func (newton *Newton) SepDiffTable() [][]float64 {
-	return newton.points
 }
 
 // configure() creates a configuration of the values of the starting points. n + 1 points are selected, as close as possible to x.
@@ -129,4 +125,44 @@ func (newton *Newton) buildDiff(n int) {
 		length--
 		k++
 	}
+}
+
+// SepFiffTable() prints a table of the separated differences of the last operation.
+func (newton *Newton) PrintDiffTable() {
+	k := len(newton.config[0])*16 + 1
+	printLine(k)
+
+	fmt.Printf("|       x       |       y       ")
+	for i := 2; i < len(newton.config[0]); i++ {
+		fmt.Printf("| y(x%-2d,..,x%-2d) ", 0, i-1)
+	}
+	fmt.Println("|")
+
+	printLine(k)
+
+	for i := 0; i < len(newton.config); i++ {
+		for j := 0; j < len(newton.config[i]); j++ {
+			fmt.Printf("| ")
+			if newton.config[i][j] >= 0 {
+				fmt.Printf(" ")
+			}
+			fmt.Printf("%-12f ", newton.config[i][j])
+			if newton.config[i][j] < 0 {
+				fmt.Printf(" ")
+			}
+		}
+		for j := 0; j < len(newton.config[0])-len(newton.config[i]); j++ {
+			fmt.Printf("|               ")
+		}
+		fmt.Println("|")
+	}
+
+	printLine(k)
+}
+
+func printLine(k int) {
+	for i := 0; i < k; i++ {
+		fmt.Print("-")
+	}
+	fmt.Println()
 }

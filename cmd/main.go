@@ -53,5 +53,5 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Println(res)
-	fmt.Println(newton.SepDiffTable())
+	newton.PrintDiffTable()
 }
