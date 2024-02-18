@@ -12,6 +12,7 @@ var (
 )
 
 const (
+	delta    float64 = 1e-7
 	UndefNum float64 = -1
 )
 
@@ -23,15 +24,35 @@ type Newton struct {
 // CreateNewtonPolinomial() creates a Newton structure that implements interpolation using the Newton polynomial.
 // points[i][0] - x coordinate.
 // points[i][1] - y coordinate.
-func CreateNewtonPolinomial(points [][]float64) *Newton {
-	return &Newton{points: points}
+func CreateNewtonPolinomial(points [][]float64) (*Newton, error) {
+	newton := &Newton{
+		points: make([][]float64, len(points)),
+	}
+	for i := 0; i < len(points); i++ {
+		if len(points[i]) < 2 {
+			return nil, ErrNotEnoughInputData
+		}
+		newton.points[i] = make([]float64, 2)
+		copy(newton.points[i], points[i][:2])
+	}
+
+	return newton, nil
 }
 
 // SetPoints() modifies the set of points from which the approximate value is calculated.
 // points[i][0] - x coordinate.
 // points[i][1] - y coordinate.
-func (newton *Newton) SetPoints(points [][]float64) {
-	newton.points = points
+func (newton *Newton) SetPoints(points [][]float64) error {
+	newton.points = make([][]float64, len(points))
+	for i := 0; i < len(points); i++ {
+		if len(points[i]) < 2 {
+			return ErrNotEnoughInputData
+		}
+		newton.points[i] = make([]float64, 2)
+		copy(newton.points[i], points[i][:2])
+	}
+
+	return nil
 }
 
 // Calc() calculates the approximate value of y(x) for the degree of the polynomial n.
@@ -43,15 +64,15 @@ func (newton *Newton) Calc(x float64, n int) (float64, error) {
 		return UndefNum, err
 	}
 
-	newton.buildDiff(n)
+	newton.buildDiff()
 
 	args := []float64{}
-	for i := 1; i < n+1; i++ {
+	for i := 1; i <= n+1; i++ {
 		args = append(args, newton.config[0][i])
 	}
 
 	var result, temp float64
-	for i := 0; i < n; i++ {
+	for i := 0; i < len(args); i++ {
 		temp = args[i]
 		for j := 0; j < i; j++ {
 			temp *= (x - newton.config[j][0])
@@ -109,25 +130,23 @@ func (newton *Newton) configure(x float64, n int) error {
 	return nil
 }
 
-// buildDiff() calculates the values of the separated differences.
-// n - the degree of the Newton polynomial.
-func (newton *Newton) buildDiff(n int) {
+// buildDiff() calculates the values of the divided differences.
+func (newton *Newton) buildDiff() {
 
-	length := n + 1
-	k := 1
+	numOfNodes := len(newton.config)
+	n := numOfNodes - 1 // n - the degree of the Newton polynomial.
 
-	for k <= n {
+	for k := 1; k <= n; k++ {
 		idx := len(newton.config[0]) - 1
-		for i := 0; i < length-1; i++ {
+		for i := 0; i < numOfNodes-1; i++ {
 			diff := (newton.config[i][idx] - newton.config[i+1][idx]) / (newton.config[i][0] - newton.config[i+k][0])
 			newton.config[i] = append(newton.config[i], diff)
 		}
-		length--
-		k++
+		numOfNodes--
 	}
 }
 
-// SepFiffTable() prints a table of the separated differences of the last operation.
+// SepFiffTable() prints a table of the divided differences of the last operation.
 func (newton *Newton) PrintDiffTable() {
 	k := len(newton.config[0])*16 + 1
 	printLine(k)
