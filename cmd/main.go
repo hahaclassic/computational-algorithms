@@ -4,41 +4,43 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"log/slog"
 
 	"github.com/hahaclassic/computational-algorithms.git/internal/interpolation"
-	"github.com/hahaclassic/computational-algorithms.git/internal/matrix"
 	op "github.com/hahaclassic/computational-algorithms.git/internal/operations"
 	"github.com/hahaclassic/computational-algorithms.git/internal/reader"
 )
 
 var (
-	fileName        string
-	separator       rune = ','
-	fieldsPerRecord int  = 4
-	//x               float64
-	//n               int
+	mainFile            string
+	XYFile              string
+	YXFile              string
+	separator           rune = ','
+	MainFieldsPerRecord int  = 4
+	FieldsPerRecord     int  = 2
 )
 
 func init() {
-	flag.StringVar(&fileName, "filename", "", "the data file")
-	// flag.Float64Var(&x, "x", 0, "x")
-	// flag.IntVar(&n, "n", 0, "n")
+	flag.StringVar(&mainFile, "main", "", "the main data file")
+	flag.StringVar(&XYFile, "xy", "", "the xy data file")
+	flag.StringVar(&YXFile, "yx", "", "the yx data file")
 	flag.Parse()
 
-	if fileName == "" {
-		fmt.Println(fileName)
-		log.Fatal("File name is not specified")
+	if mainFile == "" || XYFile == "" || YXFile == "" {
+		log.Fatal("Files' names are not specified")
 	}
 }
 
 func main() {
-
-	strData, err := reader.ReadCSV(fileName, separator, fieldsPerRecord)
+	data, err := reader.ReadCSVFloatMatrix(mainFile, separator, MainFieldsPerRecord)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	data, err := matrix.MatrixAtof(strData[1:])
+	dataXY, err := reader.ReadCSVFloatMatrix(XYFile, separator, FieldsPerRecord)
+	if err != nil {
+		log.Fatal(err)
+	}
+	dataYX, err := reader.ReadCSVFloatMatrix(YXFile, separator, FieldsPerRecord)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -68,13 +70,14 @@ func main() {
 		case op.ComparePolynomials:
 			err = op.Compare(newton, hermit)
 		case op.SolveSystem:
-			//
+			err = op.SolveSystemOfEquations(dataXY, dataYX)
 		case op.ChangeDegree:
 			err = op.SetNumDerivatives(hermit)
 		}
 		if err != nil {
-			fmt.Println(err)
+			slog.Error(err.Error())
 		}
 		operation = op.ChooseOperation()
 	}
+	fmt.Println("Программа завершена.")
 }

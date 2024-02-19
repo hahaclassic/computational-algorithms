@@ -1,7 +1,10 @@
 package operations
 
 import (
+	"bufio"
 	"fmt"
+	"os"
+	"strconv"
 
 	"github.com/hahaclassic/computational-algorithms.git/internal/format"
 	"github.com/hahaclassic/computational-algorithms.git/internal/interpolation"
@@ -22,12 +25,28 @@ func menu() {
 
 func ChooseOperation() Operation {
 	menu()
-	var operation Operation
-	fmt.Printf("Введите номер операции: ")
-	for _, err := fmt.Scan(&operation); err != nil; {
+	var (
+		num int
+		err error
+	)
+
+	scanner := bufio.NewScanner(os.Stdin)
+
+	for {
+		fmt.Printf("Введите номер операции: ")
+		scanner.Scan()
+		num, err = strconv.Atoi(scanner.Text())
+		if err != nil {
+			fmt.Println("[ERR]: Неверный номер операции. Введите номер повторно.")
+			continue
+		}
+		if num >= int(Exit) && num <= int(ChangeDegree) {
+			break
+		}
 		fmt.Println("[ERR]: Неверный номер операции. Введите номер повторно.")
 	}
-	return operation
+
+	return Operation(num)
 }
 
 func CalcValueByNewton(newton *interpolation.Newton) error {
@@ -135,5 +154,39 @@ func Compare(newton *interpolation.Newton, hermit *interpolation.Hermit) error {
 	fmt.Println("|")
 	format.PrintLine(20*5 - 1)
 	fmt.Println()
+	return nil
+}
+
+func SolveSystemOfEquations(pointsXY, pointsYX [][]float64) error {
+	n, err := format.ReadPolynomialDegree()
+	if err != nil {
+		return err
+	}
+	inverted, _ := interpolation.Inverse(pointsYX)
+
+	newtonXY, err := interpolation.CreateNewtonPolinomial(pointsXY)
+	if err != nil {
+		return err
+	}
+
+	newtonYX, err := interpolation.CreateNewtonPolinomial(inverted)
+	if err != nil {
+		return err
+	}
+
+	for i := 0; i < len(pointsXY); i++ {
+		y, err := newtonYX.Calc(pointsXY[i][0], n)
+		if err != nil {
+			return err
+		}
+		pointsXY[i][1] -= y
+	}
+
+	newtonXY.SetPoints(pointsXY)
+	root, err := newtonXY.FindRoot(n)
+	if err != nil {
+		return err
+	}
+	format.PrintNewtonResult(root)
 	return nil
 }

@@ -73,6 +73,9 @@ func (h *Hermit) SetNumDerivatives(numOfDerivates int) error {
 // x - the input value.
 // n - the degree of the Hermit polynomial.
 func (h *Hermit) Calc(x float64, n int) (float64, error) {
+	if n < 0 {
+		return UndefNum, ErrInvalidPolynomialDegree
+	}
 	err := h.configure(x, n)
 	if err != nil {
 		return UndefNum, err
@@ -85,6 +88,9 @@ func (h *Hermit) Calc(x float64, n int) (float64, error) {
 // FindRoot() finds root of the function (y == 0)
 // n - the degree of the Hermit polynomial.
 func (h *Hermit) FindRoot(n int) (float64, error) {
+	if n < 0 {
+		return UndefNum, ErrInvalidPolynomialDegree
+	}
 
 	idx := -1
 	for i := 0; i < len(h.points)-1; i++ {

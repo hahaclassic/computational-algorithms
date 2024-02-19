@@ -22,19 +22,3 @@ func MatrixAtof(data [][]string) ([][]float64, error) {
 
 	return result, nil
 }
-
-func MatrixTranspose(data [][]float64) [][]float64 {
-
-	matrix := make([][]float64, len(data[0]))
-	for i := 0; i < len(matrix); i++ {
-		matrix[i] = make([]float64, len(data))
-	}
-
-	for i := 0; i < len(data); i++ {
-		for j := 0; j < len(data[i]); j++ {
-			matrix[j][j] = data[i][j]
-		}
-	}
-
-	return matrix
-}

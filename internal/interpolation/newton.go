@@ -58,6 +58,9 @@ func (newton *Newton) SetPoints(points [][]float64) error {
 // x - the input value.
 // n - the degree of the Newton polynomial.
 func (newton *Newton) Calc(x float64, n int) (float64, error) {
+	if n < 0 {
+		return UndefNum, ErrInvalidPolynomialDegree
+	}
 	err := newton.configure(x, n)
 	if err != nil {
 		return UndefNum, err
@@ -70,6 +73,9 @@ func (newton *Newton) Calc(x float64, n int) (float64, error) {
 // FindRoot() finds root of the function (y == 0)
 // n - the degree of the Newton polynomial.
 func (newton *Newton) FindRoot(n int) (float64, error) {
+	if n < 0 {
+		return UndefNum, ErrInvalidPolynomialDegree
+	}
 
 	idx := -1
 	for i := 0; i < len(newton.points)-1; i++ {
