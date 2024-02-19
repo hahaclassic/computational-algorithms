@@ -174,15 +174,16 @@ func SolveSystemOfEquations(pointsXY, pointsYX [][]float64) error {
 		return err
 	}
 
+	diff := make([][]float64, len(pointsXY))
 	for i := 0; i < len(pointsXY); i++ {
 		y, err := newtonYX.Calc(pointsXY[i][0], n)
 		if err != nil {
 			return err
 		}
-		pointsXY[i][1] -= y
+		diff[i] = append(diff[i], pointsXY[i][0], pointsXY[i][1]-y)
 	}
 
-	newtonXY.SetPoints(pointsXY)
+	newtonXY.SetPoints(diff)
 	root, err := newtonXY.FindRoot(n)
 	if err != nil {
 		return err
