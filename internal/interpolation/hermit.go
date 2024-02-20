@@ -143,27 +143,34 @@ func (h *Hermit) configure(x float64, n int) error {
 
 // n - degree of the polynomial
 func (h *Hermit) fillConfig(x float64, n int, idx int) {
-	h.numOfNodes = (n + 1) * (h.numDerivatives + 1)
+	h.numOfNodes = n + 1
 	left, right := idx-1, idx
 	leftNodes := [][]float64{}
 	rightNodes := [][]float64{}
 
 	for count := 0; count < h.numOfNodes; {
+		var k int
+		if h.numOfNodes-count >= h.numDerivatives+1 {
+			k = h.numDerivatives + 1
+		} else {
+			k = h.numOfNodes - count
+		}
+
 		if left >= 0 && right < len(h.points) &&
 			math.Abs(x-h.points[left][0]) < math.Abs(h.points[right][0]-x) {
-			addCopies(&leftNodes, h.points[left][:2+h.numDerivatives], h.numDerivatives+1)
+			addCopies(&leftNodes, h.points[left][:2+h.numDerivatives], k)
 			left--
 		} else if left >= 0 && right < len(h.points) {
-			addCopies(&rightNodes, h.points[right][:2+h.numDerivatives], h.numDerivatives+1)
+			addCopies(&rightNodes, h.points[right][:2+h.numDerivatives], k)
 			right++
 		} else if right < len(h.points) {
-			addCopies(&rightNodes, h.points[right][:2+h.numDerivatives], h.numDerivatives+1)
+			addCopies(&rightNodes, h.points[right][:2+h.numDerivatives], k)
 			right++
 		} else {
-			addCopies(&leftNodes, h.points[left][:2+h.numDerivatives], h.numDerivatives+1)
+			addCopies(&leftNodes, h.points[left][:2+h.numDerivatives], k)
 			left--
 		}
-		count += h.numDerivatives + 1
+		count += k
 	}
 	slices.Reverse(leftNodes)
 	h.config = leftNodes

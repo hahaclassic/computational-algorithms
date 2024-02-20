@@ -188,6 +188,7 @@ func SolveSystemOfEquations(pointsXY, pointsYX [][]float64) error {
 	if err != nil {
 		return err
 	}
-	format.PrintNewtonResult(root)
+	y, err := newtonYX.Calc(root, n)
+	format.PrintSystemResult(root, y)
 	return nil
 }
