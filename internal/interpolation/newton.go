@@ -77,29 +77,17 @@ func (newton *Newton) FindRoot(n int) (float64, error) {
 		return UndefNum, ErrInvalidPolynomialDegree
 	}
 
-	idx := -1
-	for i := 0; i < len(newton.points)-1; i++ {
-		if math.Abs(newton.points[i][1]) < delta {
-			return newton.points[i][0], nil
-		}
-		if newton.points[i][1]*newton.points[i+1][1] < 0 {
-			idx = i + 1
-			break
-		}
-	}
-	if idx == -1 {
-		return UndefNum, ErrNoRoot
-	}
-
 	source := newton.points
 	inverted, _ := Inverse(newton.points)
 	newton.points = inverted
 
-	newton.fillConfig(0, n, idx)
-	newton.buildDiff()
+	x, err := newton.Calc(0, n)
+	if err != nil {
+		return UndefNum, err
+	}
 	newton.points = source
 
-	return newton.result(0), nil
+	return x, nil
 }
 
 // configure() creates a configuration of the values of the starting points. n + 1 points are selected, as close as possible to x.
