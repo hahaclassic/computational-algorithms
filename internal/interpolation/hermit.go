@@ -92,20 +92,6 @@ func (h *Hermit) FindRoot(n int) (float64, error) {
 		return UndefNum, ErrInvalidPolynomialDegree
 	}
 
-	idx := -1
-	for i := 0; i < len(h.points)-1; i++ {
-		if math.Abs(h.points[i][1]) < delta {
-			return h.points[i][0], nil
-		}
-		if h.points[i][1]*h.points[i+1][1] < 0 {
-			idx = i + 1
-			break
-		}
-	}
-	if idx == -1 {
-		return UndefNum, ErrNoRoot
-	}
-
 	source := h.points
 	inverted, err := Inverse(h.points)
 	if err != nil {
@@ -113,11 +99,13 @@ func (h *Hermit) FindRoot(n int) (float64, error) {
 	}
 	h.points = inverted
 
-	h.fillConfig(0, n, idx)
-	h.buildDiff()
+	x, err := h.Calc(0, n)
+	if err != nil {
+		return UndefNum, err
+	}
 	h.points = source
 
-	return h.result(0), nil
+	return x, nil
 }
 
 // configure() creates a configuration of the values of the starting points. n + 1 points are selected, as close as possible to x.
