@@ -21,9 +21,9 @@ var (
 )
 
 func init() {
-	flag.StringVar(&mainFile, "main", "", "the main data file")
-	flag.StringVar(&XYFile, "xy", "", "the xy data file")
-	flag.StringVar(&YXFile, "yx", "", "the yx data file")
+	flag.StringVar(&mainFile, "main", "./data/source_data.csv", "the main data file")
+	flag.StringVar(&XYFile, "xy", "./data/xy.csv", "the xy data file")
+	flag.StringVar(&YXFile, "yx", "./data/yx.csv", "the yx data file")
 	flag.Parse()
 
 	if mainFile == "" || XYFile == "" || YXFile == "" {
