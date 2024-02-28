@@ -174,15 +174,15 @@ func addCopies(dst *[][]float64, src []float64, n int) {
 }
 
 // buildDiff() calculates the values of the divided differences.
-// n - the degree of the Hermit polynomial.
 func (h *Hermit) buildDiff() {
 
 	h.differences = make([][]float64, h.numOfNodes)
 	for i := 0; i < h.numOfNodes; i++ {
 		h.differences[i] = h.config[i][:2]
 	}
-	numOfNodes := h.numOfNodes
-	n := h.numOfNodes - 1
+	numOfNodes := h.numOfNodes // Number of nodes in the current column of the table of differences.
+	n := h.numOfNodes - 1      // n - the degree of the Hermit polynomial.
+	factorial := 1             // From the formula of divided differences for multiple nodes
 
 	for k := 1; k <= n; k++ {
 		idx := len(h.differences[0]) - 1
@@ -190,13 +190,15 @@ func (h *Hermit) buildDiff() {
 		for i := 0; i < numOfNodes-1; i++ {
 			var diff float64
 			if k <= h.numDerivatives && math.Abs(h.differences[i][0]-h.differences[i+k][0]) < delta {
-				diff = h.config[i][k+1]
+				fmt.Println(h.differences[i][0], h.config[i][k+1], factorial)
+				diff = h.config[i][k+1] / float64(factorial)
 			} else {
 				diff = (h.differences[i][idx] - h.differences[i+1][idx]) /
 					(h.differences[i][0] - h.differences[i+k][0])
 			}
 			h.differences[i] = append(h.differences[i], diff)
 		}
+		factorial *= (k + 1)
 		numOfNodes--
 	}
 }
