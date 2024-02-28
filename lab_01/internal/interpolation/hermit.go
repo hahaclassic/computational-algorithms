@@ -60,7 +60,7 @@ func (h *Hermit) SetPoints(points [][]float64, numDerivatives int) error {
 	return nil
 }
 
-// SetPoints() modifies the num of derivatives.
+// SetNumDerivatives() modifies the num of derivatives.
 func (h *Hermit) SetNumDerivatives(numOfDerivates int) error {
 	if len(h.points[0]) < 2+numOfDerivates {
 		return ErrInvalidNumDerivates
