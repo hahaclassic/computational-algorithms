@@ -91,7 +91,6 @@ func (s *Spline) shuttle(start, end float64) {
 
 	ksiValues := make([]float64, len(s.points))
 	tetaValues := make([]float64, len(s.points))
-	ksiValues[0], tetaValues[0] = start, end
 	ksiValues[1], tetaValues[1] = start, end
 
 	for i := 2; i < len(s.points); i++ {
